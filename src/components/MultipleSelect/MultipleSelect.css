@@ -1,0 +1,53 @@
+.c-wrapper {
+   width: min(400px, 100%);
+}
+
+.i-s-wrapper {
+   position: relative
+}
+
+.selected-list {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 6px;
+}
+
+.selected-list li {
+   font-size: 1rem;
+   width: min-content;
+   padding: 3px 15px;
+   flex-shrink: 0;
+   background: #e5e5e5;
+   border-radius: 10px;
+}
+
+.selected-list li span {
+   white-space: nowrap;
+}
+
+.selected-list li .icon {
+   margin-left: 10px;
+   cursor: pointer;
+}
+
+.suggestions {
+   list-style-type: none;
+   position: absolute;
+   top: 100%;
+   left: 0;
+   width: 100%;
+   height: auto;
+}
+
+.suggestions li {
+   background: #e5e5e5;
+   cursor: pointer;
+}
+
+.suggestions li:hover {
+   background: white;
+}
+
+.suggestions li {
+   padding: 8px 15px;
+}
