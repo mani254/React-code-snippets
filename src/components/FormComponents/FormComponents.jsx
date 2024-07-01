@@ -3,25 +3,27 @@ import "./FormComponents.css";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-function TextInput({ label, variant, name, ...props }) {
+function TextInput({ label, variant, name, children, ...props }) {
 	return (
 		<div className={`input-wrapper ${variant}`}>
 			<label htmlFor={name}>{label}</label>
 			<input type="text" id={name} name={name} {...props} />
+			{children}
 		</div>
 	);
 }
 
-function NumberInput({ label, variant, name, ...props }) {
+function NumberInput({ label, variant, name, children, ...props }) {
 	return (
 		<div className={`input-wrapper ${variant}`}>
 			<label htmlFor={name}>{label}</label>
 			<input type="number" id={name} name={name} {...props} />
+			{children}
 		</div>
 	);
 }
 
-function SelectInput({ label, variant, name, options, defaultValue, ...props }) {
+function SelectInput({ label, variant, name, options, defaultValue, children, ...props }) {
 	return (
 		<div className={`select-wrapper ${variant}`}>
 			{label && <label htmlFor={name}>{label}</label>}
@@ -32,6 +34,7 @@ function SelectInput({ label, variant, name, options, defaultValue, ...props }) 
 					</option>
 				))}
 			</select>
+			{children}
 		</div>
 	);
 }
@@ -45,16 +48,17 @@ function TextArea({ label, variant, name, ...props }) {
 	);
 }
 
-function TelInput({ label, variant, name, ...props }) {
+function TelInput({ label, variant, name, children, ...props }) {
 	return (
 		<div className={`input-wrapper ${variant}`}>
 			<label htmlFor={name}>{label}</label>
 			<input type="tel" id={name} name={name} {...props} />
+			{children}
 		</div>
 	);
 }
 
-function PasswordInput({ label, variant, name, ...props }) {
+function PasswordInput({ label, variant, name, children, ...props }) {
 	const [showPassword, setShowPassword] = useState(false);
 	return (
 		<div className={`password-input ${variant}`}>
@@ -65,24 +69,27 @@ function PasswordInput({ label, variant, name, ...props }) {
 					{showPassword ? <FaEyeSlash /> : <FaEye />}
 				</span>
 			</span>
+			{children}
 		</div>
 	);
 }
 
-function Checkbox({ label, variant, name, ...props }) {
+function Checkbox({ label, variant, name, children, ...props }) {
 	return (
 		<div className={`input-wrapper ${variant}`}>
 			<input type="checkbox" id={name} name={name} {...props} />
 			<label htmlFor={name}>{label}</label>
+			{children}
 		</div>
 	);
 }
 
-function RadioButton({ label, variant, name, value, ...props }) {
+function RadioButton({ label, variant, name, value, children, ...props }) {
 	return (
 		<div className={`input-wrapper ${variant}`}>
 			<input type="radio" id={value} name={name} value={value} {...props} />
 			<label htmlFor={value}>{label}</label>
+			{children}
 		</div>
 	);
 }
