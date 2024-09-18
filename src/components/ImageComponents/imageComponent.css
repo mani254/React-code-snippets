@@ -1,0 +1,61 @@
+.images-container {
+	width: 100%;
+	background: white;
+	padding: 8px;
+	border-radius: 24px;
+}
+
+.url-button {
+	background: none;
+	border: none;
+	text-decoration: underline;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	cursor: pointer;
+}
+
+.initial-container {
+	border: 1px dashed rgba(45, 45, 45, 0.5);
+	width: 100%;
+	border-radius: 16px;
+	padding: 10px;
+}
+.initial-container > * {
+	margin-bottom: 20px;
+}
+.initial-container svg {
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	opacity: 0.5;
+}
+.initial-container p {
+	text-align: center;
+}
+
+.files-button-wrapper {
+	position: relative;
+}
+
+.files-button-wrapper input {
+	position: absolute;
+	display: block;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	opacity: 0;
+}
+.files-button-wrapper button {
+	padding: 3px 10px;
+	border-radius: 5px;
+	border: 0.3px solid rgba(45, 45, 45, 0.5);
+	margin: auto;
+	margin-bottom: 10px;
+	display: block;
+}
+
+.images-wrapper {
+	width: 100%;
+}

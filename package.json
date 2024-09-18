@@ -8,6 +8,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
+    "editorify-dev": "^1.0.1",
     "jwt-decode": "^4.0.0",
     "jwt-token": "^1.0.9",
     "react": "^18.3.1",
@@ -15,6 +16,7 @@
     "react-icons": "^5.2.1",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
+    "swiper": "^11.1.10",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
