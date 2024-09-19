@@ -3,12 +3,17 @@ const fetchImageFromUrl = async (url) => {
    try {
       const response = await fetch(url);
       if (!response.ok) {
-         throw new Error("Network response was not ok");
+         throw new Error("Image Can't be fetched");
       }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.startsWith("image/")) {
+         throw new Error("Response is not an image");
+      }
+
       return await response.blob();
    } catch (err) {
-      window.alert(err.message);
-      return null;
+      throw new Error("Image Can't be fetched")
    }
 };
 
