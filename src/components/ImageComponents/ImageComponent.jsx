@@ -2,15 +2,21 @@ import React, { useState, useEffect, useRef } from "react";
 import { fetchImageFromUrl, getPreviewUrl } from "./utils";
 import "./imageComponent.css";
 
-function ImageComponent() {
+function ImageComponent({ maxImages = 5, maxFileSize = 180, validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"] }) {
 	const [images, setImages] = useState([]);
 	const [previewImages, setPreviewImages] = useState([]);
 
 	const [showUrlInput, setShowUrlInput] = useState(false);
 	const [url, setUrl] = useState("");
+	const [isDragging, setIsDragging] = useState(false);
 
 	const coverImageRefs = useRef([]);
 	const urlInputRef = useRef(null);
+	const dragIndex = useRef(null);
+	const dragTimeout = useRef(null);
+
+	const dragContainerRef = useRef(null);
+	const ghostImageRef = useRef(null);
 
 	const setCoverImageHeight = () => {
 		coverImageRefs.current.forEach((ref) => {
@@ -40,12 +46,19 @@ function ImageComponent() {
 		if (!imgUrl) return;
 		try {
 			const image = await fetchImageFromUrl(imgUrl);
+
+			if (image.size / 1024 > maxFileSize) {
+				window.alert(`The image exceeds the maximum file size of ${maxFileSize} KB.`);
+				return;
+			}
 			if (image) {
-				setImages((prev) => [...prev, image]);
-				let previewUrl = getPreviewUrl(image);
-				setPreviewImages((prev) => [...prev, previewUrl]);
-				setUrl("");
-				setShowUrlInput(false);
+				if (validTypes.includes(image.type)) {
+					setImages((prev) => [...prev, image]);
+					let previewUrl = getPreviewUrl(image);
+					setPreviewImages((prev) => [...prev, previewUrl]);
+					setUrl("");
+					setShowUrlInput(false);
+				}
 			}
 		} catch (err) {
 			window.alert("Can't load the image");
@@ -53,10 +66,17 @@ function ImageComponent() {
 	}
 
 	async function handleFileChange(event) {
-		const files = Array.from(event.target.files);
-		const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+		let files = Array.from(event.target.files);
+
+		let sliceValue = maxImages - previewImages.length;
+		files = files.slice(0, sliceValue);
 
 		for (const file of files) {
+			console.log(file, file.size / 1024, maxFileSize);
+			if (file.size / 1024 > maxFileSize) {
+				window.alert(`File ${file.name} exceeds the maximum file size of ${maxFileSize} KB.`);
+				continue; // Skip this file
+			}
 			if (validTypes.includes(file.type)) {
 				try {
 					const image = await fetchImageFromUrl(URL.createObjectURL(file));
@@ -80,6 +100,46 @@ function ImageComponent() {
 		setImages(newImages);
 	}
 
+	const handleDragStart = (index) => {
+		dragIndex.current = index;
+		console.log("-------dragging Started--------------");
+		setIsDragging(true);
+	};
+
+	let flag = true;
+
+	const handleDragOver = (index) => {
+		if (dragIndex.current === index || !flag) return;
+
+		console.log("hello", flag, dragTimeout.current);
+		flag = false;
+
+		// console.log("hovered on the index", index);
+		// console.log("dragging Index", dragIndex.current);
+		if (dragTimeout.current) {
+			clearTimeout(dragTimeout.current);
+			console.log("timeout cleared");
+		}
+
+		dragTimeout.current = setTimeout(() => {
+			console.log("timeout function is exicuted");
+			const newPreviewImages = [...previewImages];
+			const draggedImage = newPreviewImages[dragIndex.current];
+			newPreviewImages.splice(dragIndex.current, 1);
+			newPreviewImages.splice(index, 0, draggedImage);
+
+			const newImages = [...images];
+			const draggedImg = newImages[dragIndex.current];
+			newImages.splice(dragIndex.current, 1);
+			newImages.splice(index, 0, draggedImg);
+
+			setPreviewImages(newPreviewImages);
+			setImages(newImages);
+			dragIndex.current = index;
+			console.log("positions are shifted");
+		}, 500);
+	};
+
 	return (
 		<div style={{ paddingTop: "300px", maxWidth: "600px", margin: "auto" }}>
 			<div className="image-container">
@@ -102,10 +162,25 @@ function ImageComponent() {
 							</div>
 						</div>
 					) : (
-						<div className="image-items">
+						<div className="image-items" ref={dragContainerRef}>
 							{previewImages.map((value, index) => {
 								return (
-									<div className="cover-image-wrapper" key={index} ref={(el) => (coverImageRefs.current[index] = el)}>
+									<div
+										className={`cover-image-wrapper ${isDragging && dragIndex.current === index ? "dragging" : ""}`}
+										key={index}
+										ref={(el) => (coverImageRefs.current[index] = el)}
+										draggable
+										onDragStart={() => handleDragStart(index)}
+										onDragOver={(e) => {
+											e.preventDefault();
+											handleDragOver(index);
+										}}
+										onDragEnd={() => {
+											clearTimeout(dragTimeout.current);
+											flag = true;
+											dragIndex.current = null;
+											setIsDragging(false);
+										}}>
 										<img src={value} alt="product-image" id={index} />
 										<div className="delete" onClick={() => handleDelete(index)}>
 											<svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 255.99556 255.99556" width="16px" height="16px" fillRule="nonzero">
@@ -119,19 +194,21 @@ function ImageComponent() {
 									</div>
 								);
 							})}
-							<div className="cover-image-wrapper add-block" ref={(el) => coverImageRefs.current.push(el)}>
-								<div className="file-upload">
-									<button>Add Files</button>
-									<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleFileChange} />
+							{previewImages.length < maxImages && (
+								<div className="cover-image-wrapper add-block" ref={(el) => coverImageRefs.current.push(el)}>
+									<div className="file-upload">
+										<button>Add Files</button>
+										<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleFileChange} />
+									</div>
+									<button className="url-toggle" onClick={() => setShowUrlInput(!showUrlInput)}>
+										Add From Url
+									</button>
 								</div>
-								<button className="url-toggle" onClick={() => setShowUrlInput(!showUrlInput)}>
-									Add From Url
-								</button>
-							</div>
+							)}
 						</div>
 					)}
 
-					{showUrlInput && (
+					{showUrlInput && previewImages.length < maxImages && (
 						<div className="url-input">
 							<input
 								type="text"
